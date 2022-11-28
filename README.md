@@ -6,6 +6,8 @@ Download the latest release here https://github.com/onepublegh/lswicon/releases/
 Make sure to download both the .exe and .pck files
 
 Import an image that you want to be in the icon and change the settings to your liking.
+When using the original icon texture, it is recommended that you import low res images
+as scaling a high res image down to 128x looks aliased and bad.
 
 # How to build source code
 Download Godot Game Engine from https://godotengine.org/ and export for whatever platform you want.
