@@ -4,6 +4,7 @@ var mask1 = preload("res://Assets/mask1.png")
 var mask2 = preload("res://Assets/mask2.png")
 var mask3 = preload("res://Assets/mask3.png")
 var mask4 = preload("res://Assets/mask4.png")
+var original = false
 
 onready var lineedit = $Settings/Icon/MarginContainer/GridContainer/IconColour/LineEdit
 onready var icon = $Control/Icon
@@ -19,7 +20,7 @@ onready var type = $Settings/Mask/MarginContainer/GridContainer/Type/HSlider
 func _ready():
 	get_tree().get_root().set_transparent_background(true)
 
-func _process(delta):
+func _process(_delta):
 	if Input.is_action_just_pressed("close"):
 		get_tree().quit()
 	if lineedit.text.length() > 5:
@@ -38,8 +39,12 @@ func _process(delta):
 	
 	posxl.text = "X Position: "+str(posx.value)
 	posyl.text = "Y Position: "+str(posy.value)
-	iconsprite.position = Vector2(posx.value, posy.value)
-	iconsprite.scale = Vector2(float(scaleinput.text), float(scaleinput.text))
+	if original:
+		iconsprite.scale = Vector2(float(scaleinput.text)*.25, float(scaleinput.text)*.25)
+		iconsprite.position = Vector2(posx.value*.25, posy.value*.25)
+	else:
+		iconsprite.scale = Vector2(float(scaleinput.text), float(scaleinput.text))
+		iconsprite.position = Vector2(posx.value, posy.value)
 	$Settings/Mask/MarginContainer/GridContainer/Type/Label.text = "Type: "+str(type.value)
 	$Settings/Mask/MarginContainer/GridContainer/Angle/Label.text = "Angle: "+str(rot.value)+"°"
 	$Control/Mask.rotation_degrees = rot.value
@@ -56,6 +61,26 @@ func _on_Import_pressed():
 func _on_CheckButton_toggled(button_pressed):
 	$Control/Mask.enabled = button_pressed
 
+func _on_Original_CheckButton_toggled(button_pressed):
+	if button_pressed:
+		original = true
+		icon.texture = load("res://Assets/iconwhite.png")
+		icon.position = Vector2(64,64)
+		iconsprite.position = Vector2(64,64)
+		$Control/Mask.position = Vector2(64,64)
+		$Control/Mask.scale = Vector2(0.25,0.25)
+		$Control.rect_size = Vector2(128,128)
+		$Control.rect_scale = Vector2(3,3)
+	else:
+		original = false
+		icon.texture = load("res://Assets/iconwhite512.png")
+		icon.position = Vector2(256,256)
+		iconsprite.position = Vector2(256,256)
+		$Control/Mask.position = Vector2(256,256)
+		$Control/Mask.scale = Vector2(1,1)
+		$Control.rect_size = Vector2(512,512)
+		$Control.rect_scale = Vector2(0.75,0.75)
+
 func _on_FileDialog_file_selected(path):
 	var image = Image.new()
 	image.load(path)
@@ -65,16 +90,28 @@ func _on_FileDialog_file_selected(path):
 
 func _on_Render_pressed():
 	$Control.rect_scale = Vector2(1,1)
+	$Settings.visible = false
+	$Label.visible = false
 	$FileDialog2.popup()
 
 func _on_FileDialog2_file_selected(path):
 	yield(get_tree().create_timer(0.5), "timeout")
 	save_to(path)
-	$Control.rect_scale = Vector2(3,3)
+	if original:
+		$Control.rect_scale = Vector2(3,3)
+	else:
+		$Control.rect_scale = Vector2(0.75,0.75)
+	$Settings.visible = true
+	$Label.visible = true
 
 func _on_FileDialog2_popup_hide():
 	yield(get_tree().create_timer(0.5), "timeout")
-	$Control.rect_scale = Vector2(3,3)
+	if original:
+		$Control.rect_scale = Vector2(3,3)
+	else:
+		$Control.rect_scale = Vector2(0.75,0.75)
+	$Settings.visible = true
+	$Label.visible = true
 
 export(NodePath) var viewport_path = null
 
@@ -83,6 +120,9 @@ onready var target_viewport = get_node(viewport_path) if viewport_path else get_
 func save_to(path):
 	var img = target_viewport.get_texture().get_data()
 	img.flip_y()
-	img.crop(128,128)
+	if original:
+		img.crop(128,128)
+	else:
+		img.crop(512,512)
 	img.convert(Image.FORMAT_RGBA8)
 	return img.save_png(path)
