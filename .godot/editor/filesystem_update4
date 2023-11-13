@@ -1,7 +1,0 @@
-res://default_env.tres
-res://scenes/world.tscn
-res://scenes/base_slider.tscn
-res://scenes/base_button.tscn
-res://scenes/base_check_button.tscn
-res://scripts/world.gd
-res://assets/mask.gdshader
