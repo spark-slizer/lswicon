@@ -16,7 +16,7 @@ config/features=PackedStringArray("4.1")
 boot_splash/bg_color=Color(0.141176, 0.141176, 0.141176, 0)
 boot_splash/show_image=false
 config/icon="res://assets/icon.png"
-config/windows_native_icon="res://Assets/icon.ico"
+config/windows_native_icon="res://assets/icon.ico"
 
 [display]
 
