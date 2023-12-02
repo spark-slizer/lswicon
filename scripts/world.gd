@@ -71,11 +71,11 @@ func _on_icon_colour_green_pressed():
 
 func _on_icon_image_pressed():
 	image_type = true
-	open_file.show()
+	open_file.popup()
 
 func _on_icon_mask_image_pressed():
 	image_type = false
-	open_file.show()
+	open_file.popup()
 
 func _on_clear_drawing_pressed():
 	for i in mask_viewport.get_children():
@@ -87,7 +87,9 @@ func _on_render_button_pressed():
 	icon_sprite.material.set_shader_parameter("scale", 1.0)
 	$Settings.visible = false
 	$Label.visible = false
-	save_file.show()
+	await get_tree().process_frame
+	await get_tree().process_frame
+	save_file.popup()
 
 func _on_mask_enabled_toggled(button_pressed):
 	if icon_sprite:
@@ -104,12 +106,9 @@ func _on_open_file_selected(path):
 		icon_sprite.texture = texture
 	else:
 		icon_mask_sprite.texture = texture
-		var icon_mask_scale = (1/min(icon_mask_sprite.texture.get_size().x, icon_mask_sprite.texture.get_size().y))*512
-		icon_mask_sprite.scale = Vector2(icon_mask_scale, icon_mask_scale)
 
 func _on_save_file_selected(path):
-	await get_tree().create_timer(0.1).timeout
-	save_to(path)
+	await save_to(path)
 	$Control.scale = Vector2(0.75,0.75)
 	icon_sprite.material.set_shader_parameter("scale", 0.75)
 	$Settings.visible = true
